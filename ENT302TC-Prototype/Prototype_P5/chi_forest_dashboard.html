@@ -1,0 +1,961 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Chi-Forest · Design Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root {
+      --bg: #F9FAFB;
+      --bg-soft: #ffffff;
+      --card: #ffffff;
+      --accent: #00B36D;
+      --accent-soft: rgba(34, 197, 94, 0.12);
+      --accent-strong: #008051;
+      --text: #1F2937;
+      --muted: #6b7280;
+      --border-subtle: rgba(148, 163, 184, 0.5);
+      --radius-lg: 18px;
+      --shadow-soft: 0 14px 30px rgba(15, 23, 42, 0.10);
+      --shadow-chip: 0 0 0 1px rgba(148, 163, 184, 0.4);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+        Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
+      background: radial-gradient(circle at top, #e0f2f1 0%, #f9fafb 45%, #f4f7f3 100%);
+      color: var(--text);
+    }
+
+    /* Header / Nav */
+
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      overflow-x: auto;
+      backdrop-filter: blur(14px);
+      background: linear-gradient(
+        to bottom,
+        rgba(255, 255, 255, 0.96),
+        rgba(255, 255, 255, 0.92),
+        rgba(255, 255, 255, 0.85)
+      );
+      border-bottom: 1px solid rgba(148, 163, 184, 0.35);
+    }
+
+    .header-inner {
+      max-width: 1120px;
+      margin: 0 auto;
+      padding: 10px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand-logo {
+      width: 36px;
+      height: 36px;
+      border-radius: 14px;
+      background:
+        radial-gradient(circle at 20% 0%, #facc15 0, transparent 55%),
+        radial-gradient(circle at 80% 90%, #4ade80 0, transparent 55%),
+        radial-gradient(circle at 50% 50%, #22c55e 0, #16a34a 55%, #15803d 100%);
+      box-shadow: 0 8px 18px rgba(34, 197, 94, 0.45);
+    }
+
+    .brand-text-main {
+      font-size: 17px;
+      font-weight: 650;
+      letter-spacing: 0.04em;
+    }
+
+    .brand-text-sub {
+      font-size: 11px;
+      color: var(--muted);
+    }
+
+    nav {
+      display: flex;
+      flex-wrap: nowrap;
+      gap: 8px;
+      justify-content: flex-start;
+      overflow-x: auto;
+      overflow-y: hidden;
+      white-space: nowrap;
+      padding-bottom: 4px;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    nav button {
+      border: none;
+      border-radius: 999px;
+      padding: 6px 12px;
+      font-size: 12px;
+      cursor: pointer;
+      background: rgba(255, 255, 255, 0.9);
+      color: var(--muted);
+      border: 1px solid rgba(209, 213, 219, 0.9);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.16s ease-out;
+      white-space: nowrap;
+    }
+
+    nav button:hover {
+      border-color: var(--accent);
+      color: #065f46;
+      box-shadow: 0 0 0 1px rgba(34, 197, 94, 0.35);
+      transform: translateY(-1px);
+    }
+
+    nav button.active {
+      background: linear-gradient(135deg, #bbf7d0, #4ade80, #16a34a);
+      color: #064e3b;
+      border-color: transparent;
+      box-shadow: 0 0 0 1px rgba(22, 163, 74, 0.4);
+    }
+
+    /* Layout */
+
+    main {
+      max-width: 1120px;
+      margin: 0 auto;
+      padding: 16px 16px 32px;
+    }
+
+    section {
+      display: none;
+      background: var(--bg-soft);
+      border-radius: 24px;
+      padding: 20px 18px 22px;
+      margin: 14px 0;
+      border: 1px solid rgba(209, 213, 219, 0.9);
+      box-shadow: var(--shadow-soft);
+      position: relative;
+      overflow: hidden;
+      transition: transform 0.16s ease-out, box-shadow 0.16s ease-out, border-color 0.16s ease-out;
+    }
+
+    section::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(circle at 120% -10%, rgba(110, 231, 183, 0.22), transparent 65%),
+        radial-gradient(circle at -10% 120%, rgba(190, 242, 100, 0.16), transparent 70%);
+      pointer-events: none;
+      opacity: 0.7;
+    }
+
+    section > * {
+      position: relative;
+      z-index: 1;
+    }
+
+    section.active {
+      display: block;
+    }
+
+    section:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 18px 40px rgba(15, 23, 42, 0.16);
+      border-color: rgba(74, 222, 128, 0.7);
+    }
+
+    h1, h2, h3 {
+      margin: 0 0 6px;
+    }
+
+    h1 {
+      font-size: 22px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    h2 {
+      font-size: 18px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    h3 {
+      font-size: 15px;
+      margin-top: 16px;
+      margin-bottom: 6px;
+      color: #111827;
+    }
+
+    .emoji {
+      font-size: 22px;
+    }
+
+    .tagline {
+      margin: 0 0 16px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .small {
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    /* Buttons / Chips */
+
+    .primary-btn,
+    .secondary-btn,
+    .ghost-btn {
+      border: none;
+      border-radius: 999px;
+      padding: 9px 18px;
+      font-size: 13px;
+      cursor: pointer;
+      margin-right: 8px;
+      margin-top: 8px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.16s ease-out;
+      white-space: nowrap;
+      text-decoration: none;
+    }
+
+    .primary-btn {
+      background: linear-gradient(135deg, #bbf7d0, #4ade80, #16a34a);
+      color: #064e3b;
+      font-weight: 600;
+      box-shadow: 0 10px 24px rgba(22, 163, 74, 0.35);
+      border: 1px solid rgba(187, 247, 208, 0.9);
+    }
+
+/* Make "Open Interactive Demo" look like a blue underlined link */
+    .primary-btn .demo-link-text {
+      text-decoration: underline;
+      color: #2563eb;          /* 蓝色 */
+      font-weight: 600;
+    }
+
+/* Hover state */
+    .primary-btn:hover .demo-link-text {
+      color: #1d4ed8;
+    }
+
+    .primary-btn:hover {
+      transform: translateY(-2px) scale(1.01);
+      box-shadow: 0 14px 32px rgba(22, 163, 74, 0.45);
+      filter: brightness(1.03);
+    }
+
+    .secondary-btn {
+      background: #f9fafb;
+      color: var(--text);
+      border: 1px solid rgba(209, 213, 219, 0.9);
+    }
+
+    .secondary-btn:hover {
+      border-color: var(--accent);
+      box-shadow: var(--shadow-chip);
+      background: #ecfdf3;
+      color: #065f46;
+      transform: translateY(-1px);
+    }
+
+    .ghost-btn {
+      background: transparent;
+      color: var(--muted);
+      border: 1px dashed rgba(156, 163, 175, 0.7);
+      font-size: 12px;
+      padding: 6px 14px;
+    }
+
+    .ghost-btn:hover {
+      border-style: solid;
+      border-color: var(--accent);
+      color: #065f46;
+      background: #f0fdf4;
+    }
+
+    .pill {
+      border-radius: 999px;
+      background: #f9fafb;
+      border: 1px solid rgba(209, 213, 219, 0.9);
+      padding: 3px 10px;
+      font-size: 11px;
+      margin-right: 6px;
+      margin-top: 4px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      color: var(--muted);
+    }
+
+    .pill-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 999px;
+      background: var(--accent);
+      box-shadow: 0 0 0 4px rgba(34, 197, 94, 0.22);
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 11px;
+      padding: 3px 10px;
+      border-radius: 999px;
+      background: var(--accent-soft);
+      color: var(--accent-strong);
+      margin-right: 4px;
+      margin-top: 4px;
+    }
+
+    .badge-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 999px;
+      background: var(--accent-strong);
+    }
+
+    /* Cards / Grid */
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 12px;
+    }
+
+    .card {
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--border-subtle);
+      padding: 12px 12px 13px;
+      background: #ffffff;
+      box-shadow: 0 10px 26px rgba(15, 23, 42, 0.08);
+      position: relative;
+      overflow: hidden;
+      transition: transform 0.14s ease-out, box-shadow 0.14s ease-out, border-color 0.14s ease-out;
+    }
+
+    .card::before {
+      content: "";
+      position: absolute;
+      inset: -30%;
+      background:
+        radial-gradient(circle at 120% -5%, rgba(74, 222, 128, 0.16), transparent 55%),
+        radial-gradient(circle at -10% 120%, rgba(52, 211, 153, 0.10), transparent 60%);
+      opacity: 0.9;
+      pointer-events: none;
+    }
+
+    .card > * {
+      position: relative;
+      z-index: 1;
+    }
+
+    .card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 14px 32px rgba(15, 23, 42, 0.16);
+      border-color: rgba(74, 222, 128, 0.75);
+    }
+
+    .card-header {
+      font-weight: 600;
+      margin-bottom: 4px;
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .card-header-tag {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--muted);
+    }
+
+    .highlight-box {
+      background: linear-gradient(135deg, #ecfdf3, #f0fdf4);
+      border-radius: 16px;
+      padding: 10px 12px;
+      font-size: 13px;
+      border: 1px solid rgba(52, 211, 153, 0.55);
+      margin: 8px 0 14px;
+      color: #14532d;
+    }
+
+    .highlight-box strong {
+      color: var(--accent-strong);
+    }
+
+    ul.small {
+      padding-left: 18px;
+      margin: 4px 0 8px;
+    }
+
+    /* “Diagram” blocks */
+
+    .diagram {
+      border-radius: 14px;
+      border: 1px dashed rgba(148, 163, 184, 0.9);
+      padding: 10px 11px;
+      background: #f9fafb;
+      font-size: 12px;
+      margin-top: 8px;
+      color: var(--muted);
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      white-space: pre;
+      overflow-x: auto;
+    }
+
+    footer {
+      text-align: center;
+      font-size: 11px;
+      color: #9ca3af;
+      padding: 10px 0 18px;
+    }
+
+    @media (max-width: 640px) {
+      .header-inner {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      main {
+        padding: 10px 10px 24px;
+      }
+
+      section {
+        border-radius: 18px;
+        padding: 16px 12px 18px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Back to Main Page -->
+  <a href="../index.html" style="
+    position: fixed; 
+    top: 0; 
+    left: 0; 
+    padding: 12px 20px; 
+    background-color: var(--accent-strong); 
+    color: white; 
+    text-decoration: none; 
+    font-weight: 600;
+    font-size: 14px;
+    z-index: 1000; /* Ensure it's on top */
+    border-bottom-right-radius: 8px;
+    transition: background-color 0.3s;
+  " onmouseover="this.style.backgroundColor='var(--accent)'" onmouseout="this.style.backgroundColor='var(--accent-strong)'">
+    ← BACK TO PROJECT OVERVIEW (HOME)
+  </a>
+<header>
+  <div class="header-inner">
+    <div class="brand">
+      <div class="brand-logo"></div>
+      <div>
+        <div class="brand-text-main">Chi-Forest · Design Dashboard</div>
+        <div class="brand-text-sub">Architecture · Flows · IA · Wireframes</div>
+      </div>
+    </div>
+    <nav>
+      <button class="active" data-target="overview">Overview</button>
+      <button data-target="architecture">System Architecture</button>
+      <button data-target="userflow">User Flow</button>
+      <button data-target="ia">Information Architecture</button>
+      <button data-target="wireframes">Wireframes</button>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <!-- OVERVIEW -->
+  <section id="overview" class="active">
+    <h1><span class="emoji">📊</span> Chi-Forest Prototype Design Overview</h1>
+    <p class="tagline">
+      This dashboard summarises the design artefacts behind the Chi-Forest smart, health-aware vending prototype.
+    </p>
+
+    <div class="highlight-box">
+      <strong>How to read this dashboard:</strong><br />
+      · Use the navigation on top to switch between system architecture, user flow, information architecture, and wireframes.<br />
+      · Use the demo button below to open the interactive prototype and show “from design to implementation”.
+    </div>
+
+    <div>
+      <!-- 修改这里的 href 为你的小程序文件名，例如 chi_forest_demo.html -->
+      <a class="primary-btn" href="chi_forest_demo.html" target="_blank">
+        <span class="demo-link-text">Open Interactive Demo</span>
+      </a>
+      <button class="secondary-btn" data-target="architecture">
+        View System Architecture
+      </button>
+      <button class="secondary-btn" data-target="userflow">
+        View User Flow
+      </button>
+    </div>
+
+    <h3>Design snapshot</h3>
+    <div class="grid">
+      <div class="card">
+        <div class="card-header">
+          <span>Goal of the prototype</span>
+          <span class="card-header-tag">Context</span>
+        </div>
+        <p class="small">
+          Connect Chi-Forest’s offline vending machines with a lightweight health questionnaire,
+          a rule-based recommendation engine, and behaviour-linked loyalty incentives,
+          to help users choose drinks that better match their health context.
+        </p>
+        <span class="badge"><span class="badge-dot"></span> Health-aware choice</span>
+        <span class="badge"><span class="badge-dot"></span> Context-aware vending</span>
+      </div>
+      <div class="card">
+        <div class="card-header">
+          <span>Four artefacts on this dashboard</span>
+          <span class="card-header-tag">This page</span>
+        </div>
+        <p class="small">
+          · System Architecture — how the components connect<br />
+          · User Flow — what the user does step by step<br />
+          · Information Architecture — how content is organised<br />
+          · Wireframes — page-level layout sketches
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- SYSTEM ARCHITECTURE -->
+  <section id="architecture">
+    <h2><span class="emoji">🏗️</span> System Architecture</h2>
+    <p class="tagline">
+      High-level architecture of the Chi-Forest smart healthy drink recommender (prototype version).
+    </p>
+
+    <div class="grid">
+      <div class="card">
+        <div class="card-header">
+          <span>Front-End · Mini Web App</span>
+          <span class="card-header-tag">Browser</span>
+        </div>
+        <p class="small">
+          · HTML/CSS single-page prototype with green “healthy” visual theme.<br />
+          · UI modules: landing, questionnaire, recommendations, profile, loyalty, about.<br />
+          · In-browser rule engine based on questionnaire inputs (no server required for demo).<br />
+          · Can be deployed as kiosk app, web page, or embedded in a mini-program webview.
+        </p>
+        <span class="badge"><span class="badge-dot"></span> Client-side logic</span>
+        <span class="badge"><span class="badge-dot"></span> Single-page app feel</span>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <span>Back-End · Conceptual</span>
+          <span class="card-header-tag">Extensible</span>
+        </div>
+        <p class="small">
+          For the coursework prototype, logic runs in JavaScript only. In a real deployment,
+          the architecture can connect to:<br />
+          · Nutrition & product database API<br />
+          · User health profile service<br />
+          · Recommendation engine service (rules / ML)<br />
+          · Loyalty & points service
+        </p>
+        <span class="badge"><span class="badge-dot"></span> API-ready design</span>
+        <span class="badge"><span class="badge-dot"></span> ML-friendly</span>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <span>Smart Vending Machine Layer</span>
+          <span class="card-header-tag">Concept</span>
+        </div>
+        <p class="small">
+          · Vending UI highlights slots that match the recommended drinks.<br />
+          · User scans QR → fills questionnaire → results mapped to machine.<br />
+          · Session could be linked via short session ID, QR code token, or NFC.
+        </p>
+        <span class="badge"><span class="badge-dot"></span> QR entry point</span>
+        <span class="badge"><span class="badge-dot"></span> Slot highlighting</span>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <span>Data & Rules Layer</span>
+          <span class="card-header-tag">Logic</span>
+        </div>
+        <p class="small">
+          · Questionnaire answers → structured “health profile + context + goal”.<br />
+          · Rule set maps patterns (e.g. blood sugar risk + workout) to drink categories.<br />
+          · Product-level metadata (sugar, electrolytes, caffeine) drives final ranking.
+        </p>
+        <span class="badge"><span class="badge-dot"></span> Rule-based engine</span>
+        <span class="badge"><span class="badge-dot"></span> Nutrition-aware</span>
+      </div>
+    </div>
+
+    <h3>Architecture diagram (text)</h3>
+    <div class="diagram">
+User Browser
+   │
+   ▼
+Mini Web App (HTML / CSS / JS)
+   │     ├─ UI Modules (Home, Questionnaire, Recommendation, Profile, Loyalty, About)
+   │     └─ In-browser Rule Engine
+   │
+   ├──── (Optional) REST / GraphQL APIs ───────────────────────────┐
+   │                                                               │
+   ▼                                                               ▼
+Back-End Services (concept)                             Smart Vending Machine
+   ├─ Nutrition / Product Data API                         ├─ Reads recommendation result
+   ├─ User Health Profile API                              ├─ Highlights drink slots
+   ├─ Recommendation Service                               └─ Completes purchase flow
+   └─ Loyalty & Points Service
+    </div>
+  </section>
+
+  <!-- USER FLOW -->
+  <section id="userflow">
+    <h2><span class="emoji">🧭</span> User Flow</h2>
+    <p class="tagline">
+      End-to-end flow from scanning the QR code to finishing a healthy drink purchase.
+    </p>
+
+    <div class="grid">
+      <div class="card">
+        <div class="card-header">
+          <span>1 · Entry & Overview</span>
+          <span class="card-header-tag">Home</span>
+        </div>
+        <p class="small">
+          User approaches a Chi-Forest vending machine, scans a QR code, and lands on the
+          mini web app. The home page explains the idea: “fill in a quick health questionnaire →
+          get personalised drink recommendations → see highlighted slots on the machine UI”.
+        </p>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <span>2 · Health Questionnaire</span>
+          <span class="card-header-tag">Input</span>
+        </div>
+        <p class="small">
+          The user completes four short blocks: basic info, health notes (e.g. blood sugar risk),
+          current context (e.g. just finished workout, late-night overtime), and goals
+          (e.g. sugar control, hydration, alertness, taste). On submit, data is passed to the
+          rule engine.
+        </p>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <span>3 · Recommendation & Mapping</span>
+          <span class="card-header-tag">Output</span>
+        </div>
+        <p class="small">
+          The app computes “Top Picks” and “More Options” with short explanations and health tags.
+          At the same time, a conceptual vending layout shows which slots would be highlighted for
+          this user on the real machine.
+        </p>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <span>4 · Profile & Loyalty</span>
+          <span class="card-header-tag">Retention</span>
+        </div>
+        <p class="small">
+          The profile and loyalty sections illustrate how the system could remember past choices,
+          show trends (e.g. rising share of zero-sugar drinks), and reward health-oriented
+          behaviour with Chi-Forest points and challenges.
+        </p>
+      </div>
+    </div>
+
+    <h3>Linear user flow diagram (text)</h3>
+    <div class="diagram">
+[Landing / Home]
+      │
+      ▼
+[Health Questionnaire]
+      │  (submit answers)
+      ▼
+[Recommendation Page]
+      │
+      ├─ User chooses drink on vending machine (highlighted slots)
+      │
+      └─ (Optional) View Profile & Points
+             │
+             ▼
+      [Profile / Challenges / About]
+    </div>
+  </section>
+
+  <!-- INFORMATION ARCHITECTURE -->
+  <section id="ia">
+    <h2><span class="emoji">🗂️</span> Information Architecture</h2>
+    <p class="tagline">
+      How content is structured across the prototype screens.
+    </p>
+
+    <div class="grid">
+      <div class="card">
+        <div class="card-header">
+          <span>Top-level navigation</span>
+          <span class="card-header-tag">Global IA</span>
+        </div>
+        <p class="small">
+          The prototype uses a flat top navigation bar to switch sections:
+        </p>
+        <ul class="small">
+          <li>Home</li>
+          <li>Health Questionnaire</li>
+          <li>Recommendations</li>
+          <li>My Chi-Forest Profile</li>
+          <li>Points &amp; Challenges</li>
+          <li>About the Project</li>
+        </ul>
+        <span class="badge"><span class="badge-dot"></span> Low cognitive load</span>
+        <span class="badge"><span class="badge-dot"></span> Clear entry points</span>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <span>Questionnaire content structure</span>
+          <span class="card-header-tag">Form IA</span>
+        </div>
+        <p class="small">
+          Questions are grouped into four logical blocks to keep the interaction short and focused:
+        </p>
+        <ul class="small">
+          <li>Basic profile (age, gender)</li>
+          <li>Health notes (blood sugar, weight, caffeine sensitivity, cardiovascular)</li>
+          <li>Current scene (workout, office, overtime, craving)</li>
+          <li>Goals (sugar control, hydration/electrolytes, alertness, taste)</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <span>Recommendation content structure</span>
+          <span class="card-header-tag">Result IA</span>
+        </div>
+        <p class="small">
+          The recommendation screen organises information into:
+        </p>
+        <ul class="small">
+          <li>Health snapshot (summary of input)</li>
+          <li>Top picks (highest priority drinks with tags)</li>
+          <li>More options (secondary, still-compatible drinks)</li>
+          <li>Vending mapping (slot highlighting concept)</li>
+          <li>Nutrition detail modal placeholder</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <span>Supporting information</span>
+          <span class="card-header-tag">Meta IA</span>
+        </div>
+        <p class="small">
+          Supporting content is separated from the core flow so that end-users are not overloaded,
+          but tutors and stakeholders can still inspect the logic:
+        </p>
+        <ul class="small">
+          <li>Profile &amp; history: health tags, past sessions, trends</li>
+          <li>Points &amp; challenges: how loyalty links to healthy behaviour</li>
+          <li>About: project background, pain points, role of the prototype</li>
+        </ul>
+      </div>
+    </div>
+
+    <h3>IA tree (text)</h3>
+    <div class="diagram">
+Home
+ ├─ Demo flow explanation
+ └─ Quick actions (Questionnaire, Recommendation)
+
+Health Questionnaire
+ ├─ Basic Info
+ ├─ Health Conditions
+ ├─ Current Scene
+ └─ Goals + Submit
+
+Recommendations
+ ├─ Health Snapshot
+ ├─ Top Picks
+ ├─ More Options
+ ├─ Vending Mapping
+ └─ Nutrition Details (concept)
+
+My Chi-Forest Profile
+ ├─ Profile Tags
+ ├─ Recent Recommendations
+ └─ Trend Summary
+
+Points & Challenges
+ ├─ Points Overview
+ └─ Active Challenges
+
+About the Project
+ ├─ Project Background
+ ├─ Key Pain Points
+ └─ Role of the Demo
+    </div>
+  </section>
+
+  <!-- WIREFRAMES -->
+  <section id="wireframes">
+    <h2><span class="emoji">📐</span> Wireframes</h2>
+    <p class="tagline">
+      Low-fidelity layout sketches for the key screens of the prototype.
+    </p>
+
+    <div class="grid">
+      <div class="card">
+        <div class="card-header">
+          <span>Wireframe · Home</span>
+          <span class="card-header-tag">WF-1</span>
+        </div>
+        <p class="small">
+          Hero layout emphasising the main call-to-action (start questionnaire) and the design story.
+        </p>
+        <div class="diagram">
++-----------------------------------------------------+
+| Logo · Title · Subtitle                             |
++-----------------------------------------------------+
+| [Start Health Questionnaire]  [Open Demo]           |
++-----------------------------------------------------+
+| Demo Flow Explanation (3 bullet points)             |
++-----------------------------------------------------+
+| Card: Example Health Profile   |  Card: Scenario    |
++-----------------------------------------------------+
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <span>Wireframe · Questionnaire</span>
+          <span class="card-header-tag">WF-2</span>
+        </div>
+        <p class="small">
+          Single long page with four blocks, optimised for quick completion and clear grouping.
+        </p>
+        <div class="diagram">
++-----------------------------------------------------+
+| Title: Chi-Forest Health Questionnaire              |
++-----------------------------------------------------+
+| Step 1: Basic Info                                  |
+|   - Age dropdown                                    |
+|   - Gender radio buttons                            |
++-----------------------------------------------------+
+| Step 2: Health Conditions (checkbox chips)          |
++-----------------------------------------------------+
+| Step 3: Current Scene (radio chips)                 |
++-----------------------------------------------------+
+| Step 4: Goals (checkbox chips)                      |
++-----------------------------------------------------+
+| [Submit & Generate Recommendations]                 |
++-----------------------------------------------------+
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <span>Wireframe · Recommendations</span>
+          <span class="card-header-tag">WF-3</span>
+        </div>
+        <p class="small">
+          Result page that visually separates the health snapshot, top picks, and vending mapping.
+        </p>
+        <div class="diagram">
++-----------------------------------------------------+
+| Title: Your Chi-Forest Recommendations              |
++-----------------------------------------------------+
+| Health Snapshot Box                                 |
++-----------------------------------------------------+
+| "Top Picks"                                         |
+|  [Card Top1]   [Card Top2]                          |
++-----------------------------------------------------+
+| "More Options"                                      |
+|  [Card 3]     [Card 4]                              |
++-----------------------------------------------------+
+| Vending Layout (8 slots, highlighted top picks)     |
++-----------------------------------------------------+
+| Nutrition Detail Placeholder                        |
++-----------------------------------------------------+
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <span>Wireframe · Profile & Loyalty</span>
+          <span class="card-header-tag">WF-4</span>
+        </div>
+        <p class="small">
+          Supporting screen combining profile snapshot, history, trends, and points.
+        </p>
+        <div class="diagram">
++----------------------+   +-------------------------+
+| Profile Tags Card    |   | Points Overview Card    |
++----------------------+   +-------------------------+
+| Recent Sessions Card |   | Challenges Card(s)      |
++----------------------+   +-------------------------+
+| Trend Summary Card                               |
++--------------------------------------------------+
+        </div>
+      </div>
+    </div>
+
+    <button class="ghost-btn" data-target="overview">
+      ← Back to Overview
+    </button>
+  </section>
+</main>
+
+<footer>
+  Chi-Forest · Design Dashboard (for coursework presentation)
+</footer>
+
+<script>
+  const navButtons = document.querySelectorAll("nav button, [data-target]");
+  const sections = document.querySelectorAll("main section");
+
+  function showSection(id) {
+    sections.forEach(sec => {
+      sec.classList.toggle("active", sec.id === id);
+    });
+    document.querySelectorAll("header nav button").forEach(btn => {
+      btn.classList.toggle("active", btn.getAttribute("data-target") === id);
+    });
+  }
+
+  navButtons.forEach(btn => {
+    btn.addEventListener("click", () => {
+      const target = btn.getAttribute("data-target");
+      if (!target) return;
+      showSection(target);
+    });
+  });
+</script>
+</body>
+</html>
