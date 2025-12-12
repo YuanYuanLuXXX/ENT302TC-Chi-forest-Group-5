@@ -1,0 +1,1031 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Chi-Forest · Journey Maps</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root {
+      --bg: #f4f7f3;
+      --bg-soft: #ffffff;
+      --card: #ffffff;
+      --accent: #22c55e;
+      --accent-soft: rgba(34, 197, 94, 0.12);
+      --accent-strong: #16a34a;
+      --text: #111827;
+      --muted: #6b7280;
+      --border-subtle: rgba(148, 163, 184, 0.5);
+      --radius-lg: 18px;
+      --shadow-soft: 0 14px 30px rgba(15, 23, 42, 0.10);
+      --shadow-chip: 0 0 0 1px rgba(148, 163, 184, 0.4);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+        Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
+      background: radial-gradient(circle at top, #e0f2f1 0%, #f9fafb 45%, #f4f7f3 100%);
+      color: var(--text);
+    }
+
+    /* Header & Nav */
+
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      overflow-x: auto;
+      backdrop-filter: blur(14px);
+      background: linear-gradient(
+        to bottom,
+        rgba(255, 255, 255, 0.96),
+        rgba(255, 255, 255, 0.92),
+        rgba(255, 255, 255, 0.85)
+      );
+      border-bottom: 1px solid rgba(148, 163, 184, 0.35);
+    }
+
+    .header-inner {
+      max-width: 1120px;
+      margin: 0 auto;
+      padding: 10px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand-logo {
+      width: 36px;
+      height: 36px;
+      border-radius: 14px;
+      background:
+        radial-gradient(circle at 20% 0%, #facc15 0, transparent 55%),
+        radial-gradient(circle at 80% 90%, #4ade80 0, transparent 55%),
+        radial-gradient(circle at 50% 50%, #22c55e 0, #16a34a 55%, #15803d 100%);
+      box-shadow: 0 8px 18px rgba(34, 197, 94, 0.45);
+    }
+
+    .brand-text-main {
+      font-size: 17px;
+      font-weight: 650;
+      letter-spacing: 0.04em;
+    }
+
+    .brand-text-sub {
+      font-size: 11px;
+      color: var(--muted);
+    }
+
+    nav {
+      display: flex;
+      flex-wrap: nowrap;
+      gap: 8px;
+      justify-content: flex-start;
+      overflow-x: auto;
+      overflow-y: hidden;
+      white-space: nowrap;
+      padding-bottom: 4px;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    nav button {
+      border: none;
+      border-radius: 999px;
+      padding: 6px 12px;
+      font-size: 12px;
+      cursor: pointer;
+      background: rgba(255, 255, 255, 0.9);
+      color: var(--muted);
+      border: 1px solid rgba(209, 213, 219, 0.9);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.16s ease-out;
+      white-space: nowrap;
+    }
+
+    nav button:hover {
+      border-color: var(--accent);
+      color: #065f46;
+      box-shadow: 0 0 0 1px rgba(34, 197, 94, 0.35);
+      transform: translateY(-1px);
+    }
+
+    nav button.active {
+      background: linear-gradient(135deg, #bbf7d0, #4ade80, #16a34a);
+      color: #064e3b;
+      border-color: transparent;
+      box-shadow: 0 0 0 1px rgba(22, 163, 74, 0.4);
+    }
+
+    /* Layout */
+
+    main {
+      max-width: 1120px;
+      margin: 0 auto;
+      padding: 16px 16px 32px;
+    }
+
+    section {
+      display: none;
+      background: var(--bg-soft);
+      border-radius: 24px;
+      padding: 20px 18px 22px;
+      margin: 14px 0;
+      border: 1px solid rgba(209, 213, 219, 0.9);
+      box-shadow: var(--shadow-soft);
+      position: relative;
+      overflow: hidden;
+      transition: transform 0.16s ease-out, box-shadow 0.16s ease-out, border-color 0.16s ease-out;
+    }
+
+    section::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(circle at 120% -10%, rgba(110, 231, 183, 0.22), transparent 65%),
+        radial-gradient(circle at -10% 120%, rgba(190, 242, 100, 0.16), transparent 70%);
+      pointer-events: none;
+      opacity: 0.7;
+    }
+
+    section > * {
+      position: relative;
+      z-index: 1;
+    }
+
+    section.active {
+      display: block;
+    }
+
+    section:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 18px 40px rgba(15, 23, 42, 0.16);
+      border-color: rgba(74, 222, 128, 0.7);
+    }
+
+    h1, h2, h3 {
+      margin: 0 0 6px;
+    }
+
+    h1 {
+      font-size: 22px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    h2 {
+      font-size: 18px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    h3 {
+      font-size: 15px;
+      margin-top: 16px;
+      margin-bottom: 6px;
+      color: #111827;
+    }
+
+    .emoji {
+      font-size: 22px;
+    }
+
+    .tagline {
+      margin: 0 0 16px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .small {
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    /* Buttons / Chips */
+
+    .primary-btn,
+    .secondary-btn {
+      border: none;
+      border-radius: 999px;
+      padding: 9px 18px;
+      font-size: 13px;
+      cursor: pointer;
+      margin-right: 8px;
+      margin-top: 8px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.16s ease-out;
+      white-space: nowrap;
+      text-decoration: none;
+    }
+
+    .primary-btn {
+      background: linear-gradient(135deg, #bbf7d0, #4ade80, #16a34a);
+      color: #064e3b;
+      font-weight: 600;
+      box-shadow: 0 10px 24px rgba(22, 163, 74, 0.35);
+      border: 1px solid rgba(187, 247, 208, 0.9);
+    }
+
+    .primary-btn:hover {
+      transform: translateY(-2px) scale(1.01);
+      box-shadow: 0 14px 32px rgba(22, 163, 74, 0.45);
+      filter: brightness(1.03);
+    }
+
+    .secondary-btn {
+      background: #f9fafb;
+      color: var(--text);
+      border: 1px solid rgba(209, 213, 219, 0.9);
+    }
+
+    .secondary-btn:hover {
+      border-color: var(--accent);
+      box-shadow: var(--shadow-chip);
+      background: #ecfdf3;
+      color: #065f46;
+      transform: translateY(-1px);
+    }
+
+    .pill {
+      border-radius: 999px;
+      background: #f9fafb;
+      border: 1px solid rgba(209, 213, 219, 0.9);
+      padding: 3px 10px;
+      font-size: 11px;
+      margin-right: 6px;
+      margin-top: 4px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      color: var(--muted);
+    }
+
+    .pill-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 999px;
+      background: var(--accent);
+      box-shadow: 0 0 0 4px rgba(34, 197, 94, 0.22);
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 11px;
+      padding: 3px 10px;
+      border-radius: 999px;
+      background: var(--accent-soft);
+      color: var(--accent-strong);
+      margin-right: 4px;
+      margin-top: 4px;
+    }
+
+    .badge-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 999px;
+      background: var(--accent-strong);
+    }
+
+    /* Grid & Cards */
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 12px;
+    }
+
+    .card {
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--border-subtle);
+      padding: 12px 12px 13px;
+      background: #ffffff;
+      box-shadow: 0 10px 26px rgba(15, 23, 42, 0.08);
+      position: relative;
+      overflow: hidden;
+      transition: transform 0.14s ease-out, box-shadow 0.14s ease-out, border-color 0.14s ease-out;
+    }
+
+    .card::before {
+      content: "";
+      position: absolute;
+      inset: -30%;
+      background:
+        radial-gradient(circle at 120% -5%, rgba(74, 222, 128, 0.16), transparent 55%),
+        radial-gradient(circle at -10% 120%, rgba(52, 211, 153, 0.10), transparent 60%);
+      opacity: 0.9;
+      pointer-events: none;
+    }
+
+    .card > * {
+      position: relative;
+      z-index: 1;
+    }
+
+    .card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 14px 32px rgba(15, 23, 42, 0.16);
+      border-color: rgba(74, 222, 128, 0.75);
+    }
+
+    .card-header {
+      font-weight: 600;
+      margin-bottom: 4px;
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .card-header-tag {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--muted);
+    }
+
+    ul.small {
+      padding-left: 18px;
+      margin: 4px 0 8px;
+    }
+
+    /* Journey Timeline */
+
+    .journey-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1.2fr) minmax(0, 1.4fr);
+      gap: 14px;
+      margin-top: 10px;
+    }
+
+    .timeline {
+      background: #f9fafb;
+      border-radius: 16px;
+      padding: 12px 10px;
+      border: 1px solid rgba(209, 213, 219, 0.9);
+    }
+
+    .timeline-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 6px;
+    }
+
+    .timeline-header span {
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .timeline-steps {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .timeline-step {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      padding: 8px 6px;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: background 0.15s ease-out, transform 0.12s ease-out;
+    }
+
+    .timeline-step:hover {
+      background: #ecfdf3;
+      transform: translateY(-1px);
+    }
+
+    .timeline-step.active {
+      background: linear-gradient(135deg, #bbf7d0, #dcfce7);
+      box-shadow: 0 8px 16px rgba(22, 163, 74, 0.25);
+    }
+
+    .timeline-step-index {
+      width: 22px;
+      height: 22px;
+      border-radius: 999px;
+      background: #e5e7eb;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      color: #4b5563;
+      flex-shrink: 0;
+    }
+
+    .timeline-step.active .timeline-step-index {
+      background: #16a34a;
+      color: #ecfdf5;
+      box-shadow: 0 0 0 4px rgba(22, 163, 74, 0.25);
+    }
+
+    .timeline-step-title {
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    .timeline-step-desc {
+      font-size: 11px;
+      color: var(--muted);
+    }
+
+    /* Detail panel */
+
+    .detail-panel {
+      background: #ffffff;
+      border-radius: 16px;
+      padding: 12px 12px 14px;
+      border: 1px solid rgba(209, 213, 219, 0.9);
+      box-shadow: 0 8px 20px rgba(15, 23, 42, 0.08);
+    }
+
+    .detail-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 4px;
+    }
+
+    .detail-title {
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .detail-meta {
+      font-size: 11px;
+      color: var(--muted);
+    }
+
+    .toggle-group {
+      display: inline-flex;
+      border-radius: 999px;
+      border: 1px solid rgba(209, 213, 219, 0.9);
+      overflow: hidden;
+    }
+
+    .toggle-chip {
+      padding: 4px 10px;
+      font-size: 11px;
+      cursor: pointer;
+      background: #f9fafb;
+      color: var(--muted);
+      border-right: 1px solid rgba(209, 213, 219, 0.7);
+      user-select: none;
+    }
+
+    .toggle-chip:last-child {
+      border-right: none;
+    }
+
+    .toggle-chip.active {
+      background: #dcfce7;
+      color: #065f46;
+      font-weight: 600;
+    }
+
+    .detail-section {
+      margin-top: 8px;
+    }
+
+    .detail-section-title {
+      font-size: 12px;
+      font-weight: 600;
+      margin-bottom: 2px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .detail-section-pain::before {
+      content: "⚠️";
+      font-size: 13px;
+    }
+
+    .detail-section-insight::before {
+      content: "💡";
+      font-size: 13px;
+    }
+
+    .muted-section {
+      opacity: 0.35;
+      filter: grayscale(0.2);
+    }
+
+    /* Compare layout */
+
+    .compare-layout {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 12px;
+      margin-top: 10px;
+    }
+
+    footer {
+      text-align: center;
+      font-size: 11px;
+      color: #9ca3af;
+      padding: 10px 0 18px;
+    }
+
+    @media (max-width: 768px) {
+      .journey-layout {
+        grid-template-columns: minmax(0, 1fr);
+      }
+    }
+
+    @media (max-width: 640px) {
+      .header-inner {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      main {
+        padding: 10px 10px 24px;
+      }
+
+      section {
+        border-radius: 18px;
+        padding: 16px 12px 18px;
+      }
+    }
+  </style>
+</head>
+<body>
+<header>
+  <div class="header-inner">
+    <div class="brand">
+      <div class="brand-logo"></div>
+      <div>
+        <div class="brand-text-main">Chi-Forest · Journey Maps</div>
+        <div class="brand-text-sub">Post-Workout · Daily Routine · Smart Vending</div>
+      </div>
+    </div>
+    <nav>
+      <button class="active" data-target="overview">Overview</button>
+      <button data-target="journey-a">Journey Map A</button>
+      <button data-target="journey-b">Journey Map B</button>
+      <button data-target="compare">Compare A & B</button>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <!-- OVERVIEW -->
+  <section id="overview" class="active">
+    <h1><span class="emoji">🗺️</span> Journey Maps Overview</h1>
+    <p class="tagline">
+      Two key journeys around Chi-Forest vending machines: post-workout hydration and everyday on-campus / office routines.
+    </p>
+
+    <div class="grid">
+      <div class="card">
+        <div class="card-header">
+          <span>Journey Map A · Post-Workout Beverage Purchase</span>
+          <span class="card-header-tag">Scenario</span>
+        </div>
+        <p class="small">
+          The user finishes a gym session, feels dehydrated, approaches a vending machine,
+          and makes a guess-based drink choice without receiving explicit hydration guidance.
+        </p>
+        <span class="badge"><span class="badge-dot"></span> Post-exercise context</span>
+        <span class="badge"><span class="badge-dot"></span> Hydration & electrolytes</span>
+        <div style="margin-top:8px;">
+          <button class="secondary-btn" data-target="journey-a">View Journey A</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <span>Journey Map B · On-Campus / Office Daily Routine</span>
+          <span class="card-header-tag">Scenario</span>
+        </div>
+        <p class="small">
+          The user is in a normal study or workday, quickly purchases a drink during a break,
+          and receives no feedback or tracking on hydration or sugar intake.
+        </p>
+        <span class="badge"><span class="badge-dot"></span> Convenience-first</span>
+        <span class="badge"><span class="badge-dot"></span> Habit & loyalty</span>
+        <div style="margin-top:8px;">
+          <button class="secondary-btn" data-target="journey-b">View Journey B</button>
+        </div>
+      </div>
+    </div>
+
+    <h3>Why these two journeys?</h3>
+    <p class="small">
+      · They represent two high-frequency touchpoints where Chi-Forest can embed health guidance into familiar vending behaviour.<br />
+      · They show how the same recommendation engine can adapt to different triggers, goals, and pain points.<br />
+      · Together, they frame the design of the questionnaire, recommendation logic, and loyalty features in the prototype.
+    </p>
+  </section>
+
+  <!-- JOURNEY MAP A -->
+  <section id="journey-a">
+    <h2><span class="emoji">🏋️‍♀️</span> Journey Map A · Post-Workout Beverage Purchase</h2>
+    <p class="tagline">
+      A gym user finishes a workout and wants the “right” drink to rehydrate and recover, with minimal decision effort.
+    </p>
+
+    <div class="journey-layout">
+      <!-- Left: clickable timeline -->
+      <div class="timeline">
+        <div class="timeline-header">
+          <span>Actions (tap a step to inspect)</span>
+          <span class="pill">
+            <span class="pill-dot"></span> Trigger: Finished gym session
+          </span>
+        </div>
+        <ul class="timeline-steps" id="timeline-a">
+          <li class="timeline-step active" data-step="1">
+            <div class="timeline-step-index">1</div>
+            <div>
+              <div class="timeline-step-title">Approaches vending machine</div>
+              <div class="timeline-step-desc">Looks at the machine right after leaving the gym.</div>
+            </div>
+          </li>
+          <li class="timeline-step" data-step="2">
+            <div class="timeline-step-index">2</div>
+            <div>
+              <div class="timeline-step-title">Browses visually</div>
+              <div class="timeline-step-desc">Compares electrolytes, sparkling water, low-sugar tea by packaging.</div>
+            </div>
+          </li>
+          <li class="timeline-step" data-step="3">
+            <div class="timeline-step-index">3</div>
+            <div>
+              <div class="timeline-step-title">Feels uncertain</div>
+              <div class="timeline-step-desc">Unsure which drink best supports hydration & recovery.</div>
+            </div>
+          </li>
+          <li class="timeline-step" data-step="4">
+            <div class="timeline-step-index">4</div>
+            <div>
+              <div class="timeline-step-title">Makes a guess-based purchase</div>
+              <div class="timeline-step-desc">Selects a familiar drink without checking nutrition details.</div>
+            </div>
+          </li>
+          <li class="timeline-step" data-step="5">
+            <div class="timeline-step-index">5</div>
+            <div>
+              <div class="timeline-step-title">Consumes drink without feedback</div>
+              <div class="timeline-step-desc">No confirmation if choice was good for post-workout recovery.</div>
+            </div>
+          </li>
+        </ul>
+      </div>
+
+      <!-- Right: detail panel -->
+      <div class="detail-panel" id="detail-a">
+        <div class="detail-header">
+          <div>
+            <div class="detail-title">Step 1 · Approaches vending machine</div>
+            <div class="detail-meta">Context: just finished workout · feels hot and thirsty</div>
+          </div>
+          <div class="toggle-group" data-for="a">
+            <div class="toggle-chip active" data-mode="all">All</div>
+            <div class="toggle-chip" data-mode="pain">Pain Points</div>
+            <div class="toggle-chip" data-mode="insights">Insights</div>
+          </div>
+        </div>
+
+        <div class="detail-section detail-section-pain" data-type="pain">
+          <div class="detail-section-title">Pain Points</div>
+          <ul class="small">
+            <li>No personalised hydration guidance despite clear post-exercise context.</li>
+            <li>Limited product information on the machine (electrolytes, sugar, caffeine not obvious).</li>
+            <li>Decision fatigue in front of too many similar-looking options.</li>
+          </ul>
+        </div>
+
+        <div class="detail-section detail-section-insight" data-type="insights">
+          <div class="detail-section-title">Insights</div>
+          <ul class="small">
+            <li>A context-aware recommendation engine can prioritise electrolyte-rich, low-sugar options.</li>
+            <li>Highlighting “post-workout friendly” drinks can increase user confidence and satisfaction.</li>
+            <li>Clear labels like “For recovery” or “Low-sugar hydration” turn a random purchase into a guided choice.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- JOURNEY MAP B -->
+  <section id="journey-b">
+    <h2><span class="emoji">🏫</span> Journey Map B · On-Campus / Office Daily Routine</h2>
+    <p class="tagline">
+      A student or office worker takes a quick break, buys a drink by habit, and receives no health feedback.
+    </p>
+
+    <div class="journey-layout">
+      <!-- Left: clickable timeline -->
+      <div class="timeline">
+        <div class="timeline-header">
+          <span>Actions (tap a step to inspect)</span>
+          <span class="pill">
+            <span class="pill-dot"></span> Trigger: Thirsty / mentally tired
+          </span>
+        </div>
+        <ul class="timeline-steps" id="timeline-b">
+          <li class="timeline-step active" data-step="1">
+            <div class="timeline-step-index">1</div>
+            <div>
+              <div class="timeline-step-title">Walks to vending machine</div>
+              <div class="timeline-step-desc">Goes after class or between meetings.</div>
+            </div>
+          </li>
+          <li class="timeline-step" data-step="2">
+            <div class="timeline-step-index">2</div>
+            <div>
+              <div class="timeline-step-title">Skims options quickly</div>
+              <div class="timeline-step-desc">Looks for something convenient and familiar.</div>
+            </div>
+          </li>
+          <li class="timeline-step" data-step="3">
+            <div class="timeline-step-index">3</div>
+            <div>
+              <div class="timeline-step-title">Buys familiar drink</div>
+              <div class="timeline-step-desc">Chooses based on taste and habit, not health impact.</div>
+            </div>
+          </li>
+          <li class="timeline-step" data-step="4">
+            <div class="timeline-step-index">4</div>
+            <div>
+              <div class="timeline-step-title">Consumes without reflection</div>
+              <div class="timeline-step-desc">No awareness of cumulative sugar or hydration patterns.</div>
+            </div>
+          </li>
+          <li class="timeline-step" data-step="5">
+            <div class="timeline-step-index">5</div>
+            <div>
+              <div class="timeline-step-title">No behavioural memory</div>
+              <div class="timeline-step-desc">System does not remember the choice or reward healthy behaviour.</div>
+            </div>
+          </li>
+        </ul>
+      </div>
+
+      <!-- Right: detail panel -->
+      <div class="detail-panel" id="detail-b">
+        <div class="detail-header">
+          <div>
+            <div class="detail-title">Step 1 · Walks to vending machine</div>
+            <div class="detail-meta">Context: between classes / meetings, limited time</div>
+          </div>
+          <div class="toggle-group" data-for="b">
+            <div class="toggle-chip active" data-mode="all">All</div>
+            <div class="toggle-chip" data-mode="pain">Pain Points</div>
+            <div class="toggle-chip" data-mode="insights">Insights</div>
+          </div>
+        </div>
+
+        <div class="detail-section detail-section-pain" data-type="pain">
+          <div class="detail-section-title">Pain Points</div>
+          <ul class="small">
+            <li>No integration between daily drink purchases and health behaviour tracking.</li>
+            <li>Loyalty mechanisms feel purely transactional (points for spending, not for healthy choices).</li>
+            <li>Users do not see trends in their hydration or sugar consumption over time.</li>
+          </ul>
+        </div>
+
+        <div class="detail-section detail-section-insight" data-type="insights">
+          <div class="detail-section-title">Insights</div>
+          <ul class="small">
+            <li>A low-effort system that “rides on” existing routines can introduce gentle health nudges.</li>
+            <li>Linking loyalty points to healthier drink selections makes rewards more meaningful.</li>
+            <li>Simple visual feedback on sugar / hydration history can build long-term awareness.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- COMPARE -->
+  <section id="compare">
+    <h2><span class="emoji">⚖️</span> Compare Journey A & B</h2>
+    <p class="tagline">
+      Contrasting post-workout and everyday routines to identify common design opportunities.
+    </p>
+
+    <div class="compare-layout">
+      <div class="card">
+        <div class="card-header">
+          <span>Comparison · Triggers & Context</span>
+          <span class="card-header-tag">Context</span>
+        </div>
+        <ul class="small">
+          <li><strong>Journey A:</strong> Clear “post-workout” trigger, strong need for hydration and recovery.</li>
+          <li><strong>Journey B:</strong> Diffuse trigger (thirst, fatigue), focus on convenience and speed.</li>
+        </ul>
+        <span class="badge"><span class="badge-dot"></span> Context-aware logic</span>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <span>Comparison · Pain Points</span>
+          <span class="card-header-tag">Pain</span>
+        </div>
+        <ul class="small">
+          <li>Both journeys lack personalised guidance at the vending machine interface.</li>
+          <li>Users receive no feedback about whether their drink choice aligned with their health goals.</li>
+          <li>Loyalty and behaviour tracking are either absent or not linked to “healthy” decisions.</li>
+        </ul>
+        <span class="badge"><span class="badge-dot"></span> Guidance gap</span>
+        <span class="badge"><span class="badge-dot"></span> Behaviour visibility</span>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <span>Comparison · Opportunities</span>
+          <span class="card-header-tag">Design</span>
+        </div>
+        <ul class="small">
+          <li>Use a single health questionnaire + rule engine that adapts to both contexts.</li>
+          <li>Highlight recommended drinks on the vending UI using context-specific tags (e.g. “Post-workout hydration”, “Low-sugar everyday”).</li>
+          <li>Connect loyalty points and challenges to patterns seen across both journeys.</li>
+        </ul>
+        <span class="badge"><span class="badge-dot"></span> Unified engine</span>
+        <span class="badge"><span class="badge-dot"></span> Contextual messaging</span>
+      </div>
+    </div>
+
+    <h3>Next step</h3>
+    <p class="small">
+      These journey maps feed directly into the questionnaire design (questions about exercise, sugar risk, scene, and goals),
+      the recommendation rules, and the loyalty mechanics implemented in the interactive Chi-Forest prototype.
+    </p>
+  </section>
+</main>
+
+<footer>
+  Chi-Forest · Journey Maps (for coursework prototype)
+</footer>
+
+<script>
+  // --------- NAVIGATION ----------
+  const navButtons = document.querySelectorAll("nav button, [data-target]");
+  const sections = document.querySelectorAll("main section");
+
+  function showSection(id) {
+    sections.forEach(sec => {
+      sec.classList.toggle("active", sec.id === id);
+    });
+    document.querySelectorAll("header nav button").forEach(btn => {
+      btn.classList.toggle("active", btn.getAttribute("data-target") === id);
+    });
+  }
+
+  navButtons.forEach(btn => {
+    btn.addEventListener("click", () => {
+      const target = btn.getAttribute("data-target");
+      if (!target) return;
+      showSection(target);
+    });
+  });
+
+  // --------- JOURNEY A: timeline + detail ----------
+  const timelineA = document.getElementById("timeline-a");
+  const detailATitle = document.querySelector("#detail-a .detail-title");
+  const detailAMeta = document.querySelector("#detail-a .detail-meta");
+
+  const journeyAStepInfo = {
+    1: {
+      title: "Step 1 · Approaches vending machine",
+      meta: "Context: just finished workout · feels hot and thirsty"
+    },
+    2: {
+      title: "Step 2 · Browses visually",
+      meta: "Context: scanning options by packaging and flavour"
+    },
+    3: {
+      title: "Step 3 · Feels uncertain",
+      meta: "Context: no clear signal which drink is healthiest"
+    },
+    4: {
+      title: "Step 4 · Makes a guess-based purchase",
+      meta: "Context: falls back to familiar option, no clear guidance"
+    },
+    5: {
+      title: "Step 5 · Consumes drink without feedback",
+      meta: "Context: no confirmation if the drink fits post-workout needs"
+    }
+  };
+
+  timelineA.addEventListener("click", (e) => {
+    const step = e.target.closest(".timeline-step");
+    if (!step) return;
+
+    timelineA.querySelectorAll(".timeline-step").forEach(s => s.classList.remove("active"));
+    step.classList.add("active");
+
+    const stepId = step.getAttribute("data-step");
+    const info = journeyAStepInfo[stepId];
+    if (info) {
+      detailATitle.textContent = info.title;
+      detailAMeta.textContent = info.meta;
+    }
+  });
+
+  // --------- JOURNEY B: timeline + detail ----------
+  const timelineB = document.getElementById("timeline-b");
+  const detailBTitle = document.querySelector("#detail-b .detail-title");
+  const detailBMeta = document.querySelector("#detail-b .detail-meta");
+
+  const journeyBStepInfo = {
+    1: {
+      title: "Step 1 · Walks to vending machine",
+      meta: "Context: between classes / meetings, limited time"
+    },
+    2: {
+      title: "Step 2 · Skims options quickly",
+      meta: "Context: convenience-first, low cognitive effort"
+    },
+    3: {
+      title: "Step 3 · Buys familiar drink",
+      meta: "Context: taste & habit dominate decision"
+    },
+    4: {
+      title: "Step 4 · Consumes without reflection",
+      meta: "Context: no awareness of sugar or hydration impact"
+    },
+    5: {
+      title: "Step 5 · No behavioural memory",
+      meta: "Context: system does not record or reward behaviour"
+    }
+  };
+
+  timelineB.addEventListener("click", (e) => {
+    const step = e.target.closest(".timeline-step");
+    if (!step) return;
+
+    timelineB.querySelectorAll(".timeline-step").forEach(s => s.classList.remove("active"));
+    step.classList.add("active");
+
+    const stepId = step.getAttribute("data-step");
+    const info = journeyBStepInfo[stepId];
+    if (info) {
+      detailBTitle.textContent = info.title;
+      detailBMeta.textContent = info.meta;
+    }
+  });
+
+  // --------- PAIN / INSIGHT TOGGLES ----------
+  function setupToggle(groupIdPrefix) {
+    const group = document.querySelector(`.toggle-group[data-for="${groupIdPrefix}"]`);
+    const panel = document.getElementById(`detail-${groupIdPrefix}`);
+    if (!group || !panel) return;
+
+    const chips = group.querySelectorAll(".toggle-chip");
+    const sections = panel.querySelectorAll(".detail-section");
+
+    group.addEventListener("click", (e) => {
+      const chip = e.target.closest(".toggle-chip");
+      if (!chip) return;
+
+      // active chip
+      chips.forEach(c => c.classList.remove("active"));
+      chip.classList.add("active");
+
+      const mode = chip.getAttribute("data-mode");
+      sections.forEach(sec => sec.classList.remove("muted-section"));
+
+      if (mode === "pain") {
+        sections.forEach(sec => {
+          if (sec.dataset.type !== "pain") sec.classList.add("muted-section");
+        });
+      } else if (mode === "insights") {
+        sections.forEach(sec => {
+          if (sec.dataset.type !== "insights") sec.classList.add("muted-section");
+        });
+      }
+      // mode === "all" → nothing muted
+    });
+  }
+
+  setupToggle("a");
+  setupToggle("b");
+</script>
+</body>
+</html>
